@@ -1,21 +1,33 @@
 const { createUser, getUserByEmail } = require("../models/user");
-const { authentication, random } = require("../helpers");
+const {
+  authentication,
+  random,
+  isValidEmail,
+  isValidUsername,
+  isValidPassword,
+} = require("../helpers");
 
 const login = async (req, res) => {
+  console.log("body", req.body);
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.send(400).json({ error: "Email and password are required" });
+      let msgError = "Email and password are required";
+      return res.status(400).json({ error: msgError });
     }
 
-    const user = getUserByEmail(email);
+    const user = await getUserByEmail(email).select(
+      "+authentication.salt +authentication.password"
+    );
     if (!user) {
-      return res.send(400).json({ error: "User not found" });
+      let msgError = "User not found";
+      return res.status(400).json({ error: msgError });
     }
-
+    console.log("user", user);
     const expectedPassword = authentication(user.authentication.salt, password);
     if (user.authentication.password !== expectedPassword) {
-      return res.send(403).json({ error: "Incorrect password" });
+      let msgError = "Incorrect password";
+      return res.status(403).json({ error: msgError });
     }
 
     const salt = random();
@@ -25,30 +37,36 @@ const login = async (req, res) => {
     );
 
     await user.save();
-    res.cookie("EPILEF-AUTH", user.authentication.sessionToken, {
+    res.cookie("sessionToken", user.authentication.sessionToken, {
       domain: "localhost",
-      path: "/",
     });
 
     return res.status(200).json(user).end();
   } catch (error) {
     console.error(error);
-    return res.send(400).json({ error: "Something went wrong" });
+    return res.status(400).json({ error: "Something went wrong" });
   }
 };
 
 const register = async (req, res) => {
+  console.log(req.body);
   try {
     const { email, password, username } = req.body;
-    if (!email || !password || !email) {
-      return res
-        .send(400)
-        .json({ error: "Email, password and username are required" });
+    if (!isValidUsername(username)) {
+      return res.status(400).json({ error: "Invalid username, try again!" });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: "Invalid email, try again!" });
+    }
+
+    if (!isValidPassword(password)) {
+      return res.status(400).json({ error: "Invalid password, try again!" });
     }
 
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
-      return res.send(400).json({ error: "User already exists" });
+      return res.status(400).json({ error: "User already exists" });
     }
 
     const salt = random();
@@ -64,7 +82,7 @@ const register = async (req, res) => {
     return res.status(200).json(user).end();
   } catch (error) {
     console.log(error);
-    return res.send(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 

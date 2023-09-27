@@ -22,10 +22,12 @@ const isOwner = async (req, res, next) => {
 };
 
 const isAuthenticaded = async (req, res, next) => {
+  console.log(req.cookies);
   try {
     const sessionToken = req.cookies["EPILEF-AUTH"];
+    console.log("Session token", sessionToken);
     if (!sessionToken) {
-      return res.sendStatus(403);
+      return res.status(403).json({ message: "Session token is required" });
     }
 
     const existingUser = await getUserBySessionToken(sessionToken);
