@@ -9,6 +9,10 @@ const { connectToMongo } = require("./src/config/mongoose");
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
 const expressSession = session({
   secret: process.env.SESSION_SECRET,
   name: "user",
