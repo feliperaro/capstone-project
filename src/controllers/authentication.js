@@ -1,4 +1,4 @@
-const { createUser, getUserByEmail } = require("../models/user");
+const { createUser, getUserByEmail, getUserByUsername } = require("../models/user");
 const {
   authentication,
   random,
@@ -8,22 +8,23 @@ const {
 } = require("../helpers");
 
 const login = async (req, res) => {
-  console.log("body", req.body);
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      let msgError = "Email and password are required";
+    const { username, password } = req.body;
+    if (!username || !password) {
+      let msgError = "username and password are required";
       return res.status(400).json({ error: msgError });
     }
 
-    const user = await getUserByEmail(email).select(
+    const user = await getUserByUsername(username).select(
       "+authentication.salt +authentication.password"
     );
+    
+    console.log("user", user);
     if (!user) {
       let msgError = "User not found";
       return res.status(400).json({ error: msgError });
     }
-    console.log("user", user);
+    
     const expectedPassword = authentication(user.authentication.salt, password);
     if (user.authentication.password !== expectedPassword) {
       let msgError = "Incorrect password";
@@ -48,7 +49,7 @@ const login = async (req, res) => {
   }
 };
 
-const register = async (req, res) => {
+const signup = async (req, res) => {
   try {
     const { email, password, username } = req.body;
     if (!isValidUsername(username)) {
@@ -78,10 +79,10 @@ const register = async (req, res) => {
       },
     });
 
-    return res
-      .status(200)
-      .json({ message: "User registered with success", user: user })
-      .end();
+    req.login(user, function(err) {
+      if (err) { return next(err); }
+      res.redirect('/');
+    });
   } catch (error) {
     console.error(error);
     return res.status(400).json({ error: error.message });
@@ -90,5 +91,5 @@ const register = async (req, res) => {
 
 module.exports = {
   login,
-  register,
+  register: signup,
 };

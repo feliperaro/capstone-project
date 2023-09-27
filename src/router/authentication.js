@@ -1,20 +1,16 @@
-const { login, register } = require("../controllers/authentication");
+const { register } = require("../controllers/authentication");
 const { authentication, random } = require("../helpers/");
 const express = require("express");
 const passport = require("passport");
 
 const LocalStrategy = require("passport-local");
-const { getUserByEmail } = require("../models/user");
+const { getUserByUsername } = require("../models/user");
 
 passport.use(
-  new LocalStrategy(function (username, password, done) {
-    console.log("teste");
-    console.log("username", username);
-    const user = getUserByEmail(username).select(
+  new LocalStrategy(async function (username, password, done) {
+    const user = await getUserByUsername(username).select(
       "+authentication.salt +authentication.password"
     );
-    console.log("user", user);
-
     if (!user) {
       return done(null, false);
     }
@@ -29,20 +25,18 @@ passport.use(
       user._id.toString()
     );
 
-    user.save();
+    await user.save();
     return done(null, user);
   })
 );
 
 passport.serializeUser(function (user, cb) {
-  console.log("serializeUser", user);
   process.nextTick(function () {
     cb(null, { id: user.id, username: user.username });
   });
 });
 
 passport.deserializeUser(function (user, cb) {
-  console.log("deserializeUser", user);
   process.nextTick(function () {
     return cb(null, user);
   });
@@ -50,9 +44,7 @@ passport.deserializeUser(function (user, cb) {
 
 const router = express.Router();
 
-router.post("/register", register);
-
-router.get("/login", function (req, res, next) {
+router.get("/login", (_, res) => {
   res.render("login");
 });
 
@@ -65,7 +57,7 @@ router.post(
   })
 );
 
-router.post("/logout", function (req, res, next) {
+router.use("/logout", function (req, res, next) {
   req.logout(function (err) {
     if (err) {
       return next(err);
@@ -74,8 +66,9 @@ router.post("/logout", function (req, res, next) {
   });
 });
 
-router.get("/signup", function (req, res, next) {
+router.get("/signup", function (_, res) {
   res.render("signup");
 });
+router.post("/signup", register);
 
 module.exports = router;

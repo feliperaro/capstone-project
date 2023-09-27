@@ -41,11 +41,10 @@ const isValidUsername = (username) => {
 
 const isValidPassword = (password) => {
   // Define criteria for a valid password
-  const minLength = 8; // Minimum length
+  const minLength = 4; // Minimum length
   const hasUppercase = /[A-Z]/.test(password); // At least one uppercase letter
   const hasLowercase = /[a-z]/.test(password); // At least one lowercase letter
   const hasNumber = /[0-9]/.test(password); // At least one digit
-  const hasSpecialChar = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/.test(password); // At least one special character
 
   // Check minimum length
   if (password.length < minLength) {
@@ -53,7 +52,7 @@ const isValidPassword = (password) => {
   }
 
   // Check character type requirements
-  if (!(hasUppercase && hasLowercase && hasNumber && hasSpecialChar)) {
+  if (!(hasUppercase && hasLowercase && hasNumber)) {
     return false; // Password doesn't meet character type requirements
   }
 
