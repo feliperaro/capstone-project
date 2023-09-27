@@ -80,10 +80,10 @@ const register = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "User registered with succes", user: user })
+      .json({ message: "User registered with success", user: user })
       .end();
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(400).json({ error: error.message });
   }
 };

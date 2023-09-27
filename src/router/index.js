@@ -1,9 +1,8 @@
 const router = require("express").Router();
 const authentication = require("./authentication");
 const users = require("./users");
-
-router.use("/auth", authentication);
-router.use("/users", users);
+const products = require("./products");
+const categories = require("./categories");
 
 router.get(
   "/",
@@ -18,5 +17,10 @@ router.get(
     res.render("index", { user: req.user });
   }
 );
+
+router.use("/auth", authentication);
+router.use("/categories", categories);
+router.use("/users", users);
+router.use("/products", products);
 
 module.exports = router;

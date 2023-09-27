@@ -6,15 +6,16 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
-  description: String,
   price: {
     type: Number,
     required: true,
   },
-  category: {
-    type: Schema.Types.ObjectId,
-    ref: "Category", // Reference to the Category model (if you have one)
+  inStock: {
+    type: Number,
+    required: true,
   },
+  category: String,
+  description: String,
 });
 
 const ProductModel = mongoose.model("Product", productSchema);
@@ -23,17 +24,19 @@ const createProduct = (values) =>
   new ProductModel(values).save().then((product) => product.toObject());
 const deleteProductById = (id) => ProductModel.findByIdAndDelete({ _id: id });
 const getProductById = (id) => ProductModel.findById(id);
+const getProductByName = (name) => ProductModel.find({ name: name });
 const getProducts = () => ProductModel.find();
-const getProductsByCategoryId = (categoryId) =>
-  ProductModel.find({ category: categoryId });
+const getProductsByCategory = (category) =>
+  ProductModel.find({ category: category });
 const updateProductById = (id, values) =>
   ProductModel.findByIdAndUpdate(id, values);
 
 module.exports = {
   createProduct,
   deleteProductById,
+  getProductsByCategory,
   getProductById,
+  getProductByName,
   getProducts,
-  getProductsByCategoryId,
   updateProductById,
 };
