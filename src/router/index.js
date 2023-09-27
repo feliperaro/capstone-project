@@ -6,7 +6,7 @@ const categories = require("./categories");
 
 router.get(
   "/",
-  function (req, res, next) {
+  (req, res, next) => {
     if (!req.user) {
       return res.render("home");
     }

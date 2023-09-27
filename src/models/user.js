@@ -33,7 +33,8 @@ const createUser = (values) =>
   new UserModel(values).save().then((user) => user.toObject());
 const deleteUserById = (id) => UserModel.findByIdAndDelete({ _id: id });
 const getUsers = () => UserModel.find();
-const getUserByEmail = (email) => UserModel.findOne({ email });
+const getUserByEmail = (email) => UserModel.findOne({ email: email });
+const getUserByUsername = (username) => UserModel.findOne({ username: username });
 const getUserBySessionToken = (sessionToken) =>
   UserModel.findOne({
     "authentication.sessionToken": sessionToken,
@@ -46,6 +47,7 @@ module.exports = {
   deleteUserById,
   getUsers,
   getUserByEmail,
+  getUserByUsername,
   getUserById,
   getUserBySessionToken,
   updateUserById,
