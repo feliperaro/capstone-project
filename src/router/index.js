@@ -3,7 +3,7 @@ const authentication = require("./authentication");
 const users = require("./users");
 
 module.exports = () => {
-  authentication(router)
-  users(router);
+  router.use("/auth", authentication);
+  router.use("/users", users);
   return router;
 };

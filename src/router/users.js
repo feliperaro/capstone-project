@@ -1,6 +1,10 @@
 const { getAllUsers } = require("../controllers/users");
-const { isAuthenticaded } = require("../middlewares");
 
-module.exports = (router) => {
-  router.get("/users", isAuthenticaded, getAllUsers);
-};
+const router = require("express").Router();
+
+var ensureLogIn = require("connect-ensure-login").ensureLoggedIn;
+
+var ensureLoggedIn = ensureLogIn();
+router.get("/", ensureLoggedIn, getAllUsers);
+
+module.exports = router;
