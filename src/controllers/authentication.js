@@ -49,7 +49,6 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  console.log(req.body);
   try {
     const { email, password, username } = req.body;
     if (!isValidUsername(username)) {
@@ -79,7 +78,10 @@ const register = async (req, res) => {
       },
     });
 
-    return res.status(200).json(user).end();
+    return res
+      .status(200)
+      .json({ message: "User registered with succes", user: user })
+      .end();
   } catch (error) {
     console.log(error);
     return res.status(400).json({ error: error.message });

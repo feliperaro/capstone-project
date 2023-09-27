@@ -10,7 +10,6 @@
   </head>
   <body>
     <section class="prompt">
-      <h3>todos</h3>
       <h1>Sign in</h1>
       <% if (hasMessages) { %>
       <section class="messages">
@@ -19,7 +18,7 @@
         <% }); %>
       </section>
       <% } %>
-      <form action="/login/password" method="post">
+      <form action="/auth/login/password" method="post">
         <section>
           <label for="username">Username</label>
           <input
@@ -41,15 +40,21 @@
             required
           />
         </section>
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <button type="submit">Sign in</button>
       </form>
       <hr />
       <p class="help">Don't have an account? <a href="/signup">Sign up</a></p>
     </section>
     <footer class="info">
-      <p>Created by <a href="https://www.jaredhanson.me">Jared Hanson</a></p>
-      <p>Part of <a href="https://todomvc.com">TodoMVC</a></p>
+      <p>
+        Created by <a href="https://felipe-roque.netlify.app/">Felipe Roque</a>
+      </p>
+      <p>
+        Part of
+        <a href="https://github.com/feliperroque/capstone-project"
+          >Capstone Project</a
+        >
+      </p>
       <p>
         Authentication powered by
         <a href="https://www.passportjs.org">Passport</a>

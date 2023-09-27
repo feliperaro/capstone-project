@@ -7,9 +7,10 @@ const LocalStrategy = require("passport-local");
 const { getUserByEmail } = require("../models/user");
 
 passport.use(
-  new LocalStrategy(async function (username, password, done) {
+  new LocalStrategy(function (username, password, done) {
+    console.log("teste");
     console.log("username", username);
-    const user = await getUserByEmail(username).select(
+    const user = getUserByEmail(username).select(
       "+authentication.salt +authentication.password"
     );
     console.log("user", user);
@@ -28,18 +29,20 @@ passport.use(
       user._id.toString()
     );
 
-    await user.save();
+    user.save();
     return done(null, user);
   })
 );
 
 passport.serializeUser(function (user, cb) {
+  console.log("serializeUser", user);
   process.nextTick(function () {
     cb(null, { id: user.id, username: user.username });
   });
 });
 
 passport.deserializeUser(function (user, cb) {
+  console.log("deserializeUser", user);
   process.nextTick(function () {
     return cb(null, user);
   });
@@ -48,7 +51,6 @@ passport.deserializeUser(function (user, cb) {
 const router = express.Router();
 
 router.post("/register", register);
-router.post("/auth/login", login);
 
 router.get("/login", function (req, res, next) {
   res.render("login");
@@ -57,16 +59,12 @@ router.get("/login", function (req, res, next) {
 router.post(
   "/login/password",
   passport.authenticate("local", {
-    successReturnToOrRedirect: "/home",
-    failureRedirect: "/login",
+    successReturnToOrRedirect: "/",
+    failureRedirect: "/auth/login",
     failureMessage: true,
   })
 );
 
-/* POST /logout
- *
- * This route logs the user out.
- */
 router.post("/logout", function (req, res, next) {
   req.logout(function (err) {
     if (err) {
@@ -78,41 +76,6 @@ router.post("/logout", function (req, res, next) {
 
 router.get("/signup", function (req, res, next) {
   res.render("signup");
-});
-
-router.post("/signup", function (req, res, next) {
-  var salt = crypto.randomBytes(16);
-  crypto.pbkdf2(
-    req.body.password,
-    salt,
-    310000,
-    32,
-    "sha256",
-    function (err, hashedPassword) {
-      if (err) {
-        return next(err);
-      }
-      db.run(
-        "INSERT INTO users (username, hashed_password, salt) VALUES (?, ?, ?)",
-        [req.body.username, hashedPassword, salt],
-        function (err) {
-          if (err) {
-            return next(err);
-          }
-          var user = {
-            id: this.lastID,
-            username: req.body.username,
-          };
-          req.login(user, function (err) {
-            if (err) {
-              return next(err);
-            }
-            res.redirect("/");
-          });
-        }
-      );
-    }
-  );
 });
 
 module.exports = router;
