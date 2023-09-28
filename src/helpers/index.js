@@ -13,51 +13,66 @@ const authentication = (salt, password) => {
 };
 
 const isValidEmail = (email) => {
-  // Regular expression for a valid email format
   const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-  // Test the email against the regex pattern
   return emailRegex.test(email);
 };
 
 const isValidUsername = (username) => {
-  // Define criteria for a valid username
-  const minLength = 3; // Minimum length
-  const maxLength = 20; // Maximum length
-  const allowedCharactersRegex = /^[a-zA-Z0-9_]+$/; // Allowed characters (alphanumeric and underscore)
+  const minLength = 3;
+  const maxLength = 20;
 
-  // Check the length
   if (username.length < minLength || username.length > maxLength) {
-    return false; // Username length is not within the allowed range
+    return false;
   }
 
-  // Check allowed characters using regex
-  if (!allowedCharactersRegex.test(username)) {
-    return false; // Username contains disallowed characters
-  }
-
-  // All checks passed, username is valid
   return true;
 };
 
 const isValidPassword = (password) => {
-  // Define criteria for a valid password
-  const minLength = 4; // Minimum length
-  const hasUppercase = /[A-Z]/.test(password); // At least one uppercase letter
-  const hasLowercase = /[a-z]/.test(password); // At least one lowercase letter
-  const hasNumber = /[0-9]/.test(password); // At least one digit
+  const minLength = 4;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
 
-  // Check minimum length
   if (password.length < minLength) {
-    return false; // Password is too short
+    return false;
   }
 
-  // Check character type requirements
   if (!(hasUppercase && hasLowercase && hasNumber)) {
-    return false; // Password doesn't meet character type requirements
+    return false;
   }
 
-  // All checks passed, password is valid
   return true;
+};
+
+const isValidProduct = (product) => {
+  const requiredFields = ["name", "description", "price", "inStock"];
+  for (let field of requiredFields) {
+    if (product[field] === undefined) {
+      return {
+        isValid: false,
+        message: `missing required field. ${field}`,
+      };
+    }
+  }
+
+  if (typeof product.price !== "number" || product.price <= 0) {
+    return {
+      isValid: false,
+      message: "product price is not valid",
+    };
+  }
+  if (typeof product.inStock !== "number") {
+    return {
+      isValid: false,
+      message: "product inStock is not valid",
+    };
+  }
+
+  return {
+    isValid: true,
+    message: "product is valid",
+  };
 };
 
 module.exports = {
@@ -66,4 +81,5 @@ module.exports = {
   isValidEmail,
   isValidUsername,
   isValidPassword,
+  isValidProduct,
 };

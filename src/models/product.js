@@ -24,19 +24,25 @@ const createProduct = (values) =>
   new ProductModel(values).save().then((product) => product.toObject());
 const deleteProductById = (id) => ProductModel.findByIdAndDelete({ _id: id });
 const getProductById = (id) => ProductModel.findById(id);
-const getProductByName = (name) => ProductModel.find({ name: name });
+const getProductsByName = (name) =>
+  ProductModel.find({
+    name: {
+      $regex: name,
+      $options: "i",
+    },
+  });
 const getProducts = () => ProductModel.find();
 const getProductsByCategory = (category) =>
   ProductModel.find({ category: category });
 const updateProductById = (id, values) =>
-  ProductModel.findByIdAndUpdate(id, values);
+  ProductModel.findOneAndUpdate(id, values, { new: true });
 
 module.exports = {
   createProduct,
   deleteProductById,
   getProductsByCategory,
   getProductById,
-  getProductByName,
+  getProductsByName,
   getProducts,
   updateProductById,
 };
